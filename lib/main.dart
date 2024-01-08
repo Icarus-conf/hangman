@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: HomePage(),
     );
@@ -66,7 +66,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: primaryColor,
       appBar: AppBar(
-        title: PoppinsText(
+        title: const PoppinsText(
           text: "Hangman",
           fontS: 24,
           fontWeight: FontWeight.w600,
@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Divider(
+          const Divider(
             color: Colors.black,
           ),
           Center(
@@ -113,7 +113,7 @@ class _HomePageState extends State<HomePage> {
               crossAxisCount: 7,
               mainAxisSpacing: 8.0,
               crossAxisSpacing: 8.0,
-              padding: EdgeInsets.all(25.0),
+              padding: const EdgeInsets.all(25.0),
               children: alphabets.map((e) {
                 return RawMaterialButton(
                   onPressed: Game.selectedChar.contains(e)
@@ -133,11 +133,6 @@ class _HomePageState extends State<HomePage> {
                                 desc: "You killed that dude.",
                                 buttons: [
                                   DialogButton(
-                                    child: Text(
-                                      "Try again",
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 20),
-                                    ),
                                     onPressed: () {
                                       setState(() {
                                         Navigator.pop(context);
@@ -146,24 +141,29 @@ class _HomePageState extends State<HomePage> {
                                       });
                                     },
                                     width: 120,
+                                    child: const Text(
+                                      "Try again",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20),
+                                    ),
                                   )
                                 ],
                               ).show();
                             }
                           });
                         },
-                  child: PoppinsText(
-                    text: e,
-                    fontS: 24,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(4),
                   ),
                   fillColor: Game.selectedChar.contains(e)
                       ? Colors.black87
                       : primaryDark,
+                  child: PoppinsText(
+                    text: e,
+                    fontS: 24,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
                 );
               }).toList(),
             ),

@@ -6,7 +6,7 @@ Widget letter(String character, bool hidden) {
   return Container(
     height: 65,
     width: 50,
-    padding: EdgeInsets.all(8.0),
+    padding: const EdgeInsets.all(8.0),
     decoration: BoxDecoration(
       color: secondaryColor,
       borderRadius: BorderRadius.circular(4),
