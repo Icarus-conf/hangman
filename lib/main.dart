@@ -126,14 +126,13 @@ class _HomePageState extends State<HomePage> {
                             setState(() {
                               bool wordsMatch(List list) {
                                 List words = word.split('');
-                                //Method 1 (choose 1 only)
+
                                 for (String letter in list) {
                                   if (words.contains(letter)) {
                                     words.remove(letter);
                                   }
                                 }
-                                return words
-                                    .isEmpty; //returns true if empty meaning letters matched.
+                                return words.isEmpty;
                               }
 
                               Game.selectedChar.add(e);
@@ -159,6 +158,7 @@ class _HomePageState extends State<HomePage> {
                                           setState(() {
                                             Game.tries = 0;
                                             Game.selectedChar.clear();
+                                            correctChar.clear();
                                             Navigator.pop(context);
                                           });
                                         },
