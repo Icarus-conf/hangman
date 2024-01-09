@@ -32,6 +32,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String word = 'Icarus'.toUpperCase();
+  List<String> correctChar = [];
+
   List<String> alphabets = [
     "A",
     "B",
@@ -70,105 +72,153 @@ class _HomePageState extends State<HomePage> {
           text: "Hangman",
           fontS: 24,
           fontWeight: FontWeight.w600,
+          color: Colors.white,
         ),
         centerTitle: true,
         elevation: 0,
         backgroundColor: primaryColor,
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const Divider(
-            color: Colors.black,
-          ),
-          Center(
-            child: Stack(
-              children: [
-                figureImage(Game.tries >= 0, 'assets/hang.png'),
-                figureImage(Game.tries >= 1, 'assets/head.png'),
-                figureImage(Game.tries >= 2, 'assets/body.png'),
-                figureImage(Game.tries >= 3, 'assets/ra.png'),
-                figureImage(Game.tries >= 4, 'assets/la.png'),
-                figureImage(Game.tries >= 5, 'assets/rl.png'),
-                figureImage(Game.tries >= 6, 'assets/ll.png'),
-              ],
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Divider(
+              color: Colors.black,
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: word
-                  .split('')
-                  .map((e) => letter(e.toUpperCase(),
-                      !Game.selectedChar.contains(e.toUpperCase())))
-                  .toList(),
+            Center(
+              child: Stack(
+                children: [
+                  figureImage(Game.tries >= 0, 'assets/hang.png'),
+                  figureImage(Game.tries >= 1, 'assets/head.png'),
+                  figureImage(Game.tries >= 2, 'assets/body.png'),
+                  figureImage(Game.tries >= 3, 'assets/ra.png'),
+                  figureImage(Game.tries >= 4, 'assets/la.png'),
+                  figureImage(Game.tries >= 5, 'assets/rl.png'),
+                  figureImage(Game.tries >= 6, 'assets/ll.png'),
+                ],
+              ),
             ),
-          ),
-          SizedBox(
-            width: double.infinity,
-            height: 350.0,
-            child: GridView.count(
-              crossAxisCount: 7,
-              mainAxisSpacing: 8.0,
-              crossAxisSpacing: 8.0,
-              padding: const EdgeInsets.all(25.0),
-              children: alphabets.map((e) {
-                return RawMaterialButton(
-                  onPressed: Game.selectedChar.contains(e)
-                      ? null
-                      : () {
-                          setState(() {
-                            Game.selectedChar.add(e);
-                            print(Game.selectedChar);
-                            if (!word.split('').contains(e.toUpperCase())) {
-                              Game.tries++;
-                            }
-                            if (Game.tries == 6) {
-                              Alert(
-                                context: context,
-                                type: AlertType.error,
-                                title: "You Failed!",
-                                desc: "You killed that dude.",
-                                buttons: [
-                                  DialogButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        Navigator.pop(context);
-                                        Game.tries = 0;
-                                        Game.selectedChar.clear();
-                                      });
-                                    },
-                                    width: 120,
-                                    child: const Text(
-                                      "Try again",
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 20),
-                                    ),
-                                  )
-                                ],
-                              ).show();
-                            }
-                          });
-                        },
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  fillColor: Game.selectedChar.contains(e)
-                      ? Colors.black87
-                      : primaryDark,
-                  child: PoppinsText(
-                    text: e,
-                    fontS: 24,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
-                );
-              }).toList(),
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: word
+                    .split('')
+                    .map((e) => letter(e.toUpperCase(),
+                        !Game.selectedChar.contains(e.toUpperCase())))
+                    .toList(),
+              ),
             ),
-          ),
-        ],
+            SizedBox(
+              width: double.infinity,
+              height: 350.0,
+              child: GridView.count(
+                crossAxisCount: 7,
+                mainAxisSpacing: 8.0,
+                crossAxisSpacing: 8.0,
+                padding: const EdgeInsets.all(25.0),
+                children: alphabets.map((e) {
+                  return RawMaterialButton(
+                    onPressed: Game.selectedChar.contains(e)
+                        ? null
+                        : () {
+                            setState(() {
+                              bool wordsMatch(List list) {
+                                List words = word.split('');
+                                //Method 1 (choose 1 only)
+                                for (String letter in list) {
+                                  if (words.contains(letter)) {
+                                    words.remove(letter);
+                                  }
+                                }
+                                return words
+                                    .isEmpty; //returns true if empty meaning letters matched.
+                              }
+
+                              Game.selectedChar.add(e);
+                              print(Game.selectedChar);
+                              if (!word.split('').contains(e.toUpperCase())) {
+                                Game.tries++;
+                              } else {
+                                //add letter to correctChar for each occurrence
+                                List<String> occurrences = word
+                                    .split('')
+                                    .where((char) => char == e.toUpperCase())
+                                    .toList();
+                                correctChar.addAll(occurrences);
+                                if (wordsMatch(correctChar)) {
+                                  Alert(
+                                    context: context,
+                                    type: AlertType.success,
+                                    title: "Congrats!",
+                                    desc: "You didn't kill that dude.",
+                                    buttons: [
+                                      DialogButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            Game.tries = 0;
+                                            Game.selectedChar.clear();
+                                            Navigator.pop(context);
+                                          });
+                                        },
+                                        width: 120,
+                                        child: const Text(
+                                          "Proceed",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20),
+                                        ),
+                                      )
+                                    ],
+                                  ).show();
+                                }
+                              }
+                              if (Game.tries == 6) {
+                                Alert(
+                                  context: context,
+                                  type: AlertType.error,
+                                  title: "You Failed!",
+                                  desc: "You killed that dude.",
+                                  buttons: [
+                                    DialogButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          Game.tries = 0;
+                                          Game.selectedChar.clear();
+                                          Navigator.pop(context);
+                                        });
+                                      },
+                                      width: 120,
+                                      child: const Text(
+                                        "Try again",
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 20),
+                                      ),
+                                    )
+                                  ],
+                                ).show();
+                              }
+                            });
+                          },
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    fillColor: Game.selectedChar.contains(e)
+                        ? Colors.black87
+                        : primaryDark,
+                    child: PoppinsText(
+                      text: e,
+                      fontS: 24,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
